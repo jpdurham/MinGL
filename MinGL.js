@@ -67,8 +67,8 @@ var mingl = {
             onComplete = params.onComplete;
 
         this.createShaderFromURI(gl, gl.VERTEX_SHADER, vsURI, function(vsShader) {
-            minglib.createShaderFromURI(gl, gl.FRAGMENT_SHADER, fsURI, function(fsShader) {
-                onComplete(minglib.createProgramFromShaders(gl, vsShader, fsShader));
+            mingl.createShaderFromURI(gl, gl.FRAGMENT_SHADER, fsURI, function(fsShader) {
+                onComplete(mingl.createProgramFromShaders(gl, vsShader, fsShader));
             });
         });
     }
