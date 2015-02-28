@@ -1,28 +1,31 @@
-var MinGL = (function () {
-    function MinGL(canvas) {
-        this.canvas = canvas;
+class MinGL {
+    constructor(private canvas){
         this.setupRequestAnimationFrame();
     }
-    MinGL.prototype.getElem = function (id) {
+
+    getElem(id): any {
         document.getElementById(id);
-    };
-    MinGL.prototype.getWebGLContext = function () {
+    }
+
+    getWebGLContext(): boolean {
         return this.canvas.getContext('webgl') || this.canvas.getContext('experimental-webgl');
-    };
-    MinGL.prototype.isWebGLSupported = function () {
+    }
+
+    isWebGLSupported(): boolean {
         try {
-            var w = window;
+            var w: any = window;
             return !!(w.WebGLRenderingContext && this.getWebGLContext());
-        }
-        catch (e) {
+        } catch (e) {
             return false;
         }
-    };
-    MinGL.prototype.getSourceById = function (id) {
+    }
+
+    getSourceById(id): string {
         var shaderScript = this.getElem(id);
         if (!shaderScript) {
             return null;
         }
+
         var shaderText = "";
         var elem = shaderScript.firstChild;
         while (elem) {
@@ -32,33 +35,39 @@ var MinGL = (function () {
             elem = elem.nextSibling;
         }
         return shaderText;
-    };
-    MinGL.prototype.setupRequestAnimationFrame = function () {
-        if (window.requestAnimationFrame)
-            return;
-        var found = false;
-        ['oRequestAnimationFrame', 'webkitRequestAnimationFrame', 'mozRequestAnimationFrame'].forEach(function (impl) {
-            var w = window;
-            if (impl in w) {
-                w.requestAnimationFrame = function (callback) {
-                    w[impl](function () {
-                        callback();
-                    });
-                };
-                found = true;
-            }
-        });
+    }
+
+    setupRequestAnimationFrame() : void {
+        if (window.requestAnimationFrame) return;
+
+        var found: boolean = false;
+        ['oRequestAnimationFrame',
+            'webkitRequestAnimationFrame',
+            'mozRequestAnimationFrame'].forEach(function(impl) {
+                var w: any = window;
+                if (impl in w) {
+                    w.requestAnimationFrame = function(callback) {
+                        w[impl](function() {
+                            callback();
+                        });
+                    };
+                    found = true;
+                }
+            });
+
         if (!found) {
-            var w = window;
-            w.requestAnimationFrame = function (callback) {
-                setTimeout(function () {
+            var w: any = window;
+            w.requestAnimationFrame = function(callback) {
+                setTimeout(function() {
                     callback();
                 }, 1000 / 60);
             };
         }
-    };
+    }
+
     /* Shader setup */
-    MinGL.prototype.createShader = function (gl, type, source) {
+
+    createShader(gl: any, type: string, source: string): any {
         var shader = gl.createShader(type);
         if (shader == null) {
             console.error('Error creating the shader with shader type: ' + type);
@@ -72,24 +81,31 @@ var MinGL = (function () {
             console.error('Error while compiling the shader ' + info);
         }
         return shader;
-    };
-    MinGL.prototype.createShaderFromURI = function (gl, type, uri, callback) {
+    }
+
+    createShaderFromURI (gl: any, type: string, uri: string, callback: any): any {
         callback(this.createShader(gl, type, this.getSourceById(uri)));
-    };
-    MinGL.prototype.createProgramFromShaders = function (gl, vs, fs) {
+    }
+
+    createProgramFromShaders(gl: any, vs: any, fs: any): any {
         var program = gl.createProgram();
         gl.attachShader(program, vs);
         gl.attachShader(program, fs);
         gl.linkProgram(program);
         return program;
-    };
-    MinGL.prototype.createProgramFromURIs = function (gl, params) {
-        var vsURI = params.vsURI, fsURI = params.fsURI, onComplete = params.onComplete;
-        this.createShaderFromURI(gl, gl.VERTEX_SHADER, vsURI, function (vsShader) {
-            this.createShaderFromURI(gl, gl.FRAGMENT_SHADER, fsURI, function (fsShader) {
+    }
+
+    createProgramFromURIs(gl: any, params: any): any {
+        var vsURI = params.vsURI,
+            fsURI = params.fsURI,
+            onComplete = params.onComplete;
+
+        this.createShaderFromURI(gl, gl.VERTEX_SHADER, vsURI, function(vsShader) {
+            this.createShaderFromURI(gl, gl.FRAGMENT_SHADER, fsURI, function(fsShader) {
                 onComplete(this.createProgramFromShaders(gl, vsShader, fsShader));
             });
         });
-    };
-    return MinGL;
-})();
+    }
+}
+
+
