@@ -1,6 +1,7 @@
 var MinGL = (function () {
-    function MinGL(canvas) {
+    function MinGL(canvas, video) {
         this.canvas = canvas;
+        this.video = video;
         this.setupRequestAnimationFrame();
     }
     MinGL.prototype.getElem = function (id) {
@@ -32,6 +33,35 @@ var MinGL = (function () {
             elem = elem.nextSibling;
         }
         return shaderText;
+    };
+    MinGL.prototype.setupCamera = function (callback) {
+        var getUserMediaKey = ['getUserMedia', 'webkitGetUserMedia', 'mozGetUserMedia'], urlKey = ['URL', 'webkitURL', 'mozURL'], found = false, videoHandler = function (localMediaStream) {
+            this.video.src = window[urlKey[i]].createObjectURL(localMediaStream);
+            this.video.play();
+        }, videoHandler2 = function (stream) {
+            this.video.src = stream;
+            this.video.play();
+        }, errorHandler = function () {
+            console.log('An error occurred while loading the camera. Please refresh and try again.');
+        }, key;
+        for (var i = 0, l = getUserMediaKey.length; i < l; ++i) {
+            key = getUserMediaKey[i];
+            if (key in navigator) {
+                if (i > 0) {
+                    navigator[key]({ video: true }, videoHandler, errorHandler);
+                }
+                else {
+                    navigator[key]({ video: true }, videoHandler2, errorHandler);
+                }
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            this.getElem('useVideo').style = "display:none";
+            this.getElem('useVideo').checked = false;
+        }
+        return found;
     };
     MinGL.prototype.setupRequestAnimationFrame = function () {
         if (window.requestAnimationFrame)

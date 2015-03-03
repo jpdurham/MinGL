@@ -1,5 +1,5 @@
 class MinGL {
-    constructor(private canvas){
+    constructor(private canvas, private video){
         this.setupRequestAnimationFrame();
     }
 
@@ -35,6 +35,44 @@ class MinGL {
             elem = elem.nextSibling;
         }
         return shaderText;
+    }
+
+    setupCamera(callback): boolean {
+        var getUserMediaKey = ['getUserMedia', 'webkitGetUserMedia', 'mozGetUserMedia'],
+            urlKey = ['URL', 'webkitURL', 'mozURL'],
+            found = false,
+        videoHandler  = function(localMediaStream: any) {
+                this.video.src = window[urlKey[i]].createObjectURL(localMediaStream);
+                this.video.play();
+            },
+            videoHandler2 = function(stream: any) {
+                this.video.src = stream;
+                this.video.play();
+            },
+            errorHandler  = function() {
+                console.log('An error occurred while loading the camera. Please refresh and try again.');
+            },
+            key;
+
+        for (var i = 0, l = getUserMediaKey.length; i < l; ++i) {
+            key = getUserMediaKey[i];
+            if (key in navigator) {
+                if (i > 0) {
+                    navigator[key]({ video: true }, videoHandler,  errorHandler);
+                } else {
+                    navigator[key]({ video: true }, videoHandler2, errorHandler);
+                }
+                found = true;
+                break;
+            }
+        }
+
+        if (!found) {
+            this.getElem('useVideo').style = "display:none";
+            this.getElem('useVideo').checked = false;
+        }
+
+        return found;
     }
 
     setupRequestAnimationFrame() : void {
